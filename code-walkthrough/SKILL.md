@@ -15,9 +15,13 @@ All output is written to markdown files inside a `.walkthrough/` folder rather t
 
 ## 🛠️ Execution Pipeline
 
-### Step 1: Target Identification & Scope Ingestion
+### Step 1: Target Identification, Scope Ingestion & Framework Detection
 * Determine if the target is a **file**, **function**, or **directory**.
-* If a **directory/folder** is targeted, activate the processing rules outlined in `references/directory-traversal.md` to recursively map the directory tree without blowing past context limits.
+* If a **directory/folder** is targeted:
+  1. **Run Phase 0** of `references/directory-traversal.md`: scan the project root for manifest files (`package.json`, `pubspec.yaml`, `pom.xml`, `Cargo.toml`, `go.mod`, `*.csproj`, etc.) to identify active ecosystems.
+  2. **Activate the matching exclusion blocks** from Phase 1 of `references/directory-traversal.md` (universal + ecosystem-specific + generated-file heuristics).
+  3. Only then begin recursive traversal, skipping all excluded paths.
+* Never read or index files that match the exclusion lists — treat them as if they do not exist.
 
 ### Step 2: Determine Output Path
 
@@ -42,8 +46,9 @@ Compute the `.walkthrough/` output path using the following rules. The `.walkthr
 > **Rule**: Always preserve the original folder hierarchy inside `.walkthrough/`. Never flatten paths.
 
 ### Step 3: Contextual & Dependency Mapping
-* Read the codebase files matching the inclusion criteria.
-* If analyzing a directory, construct an internal dependency map showing how files within this directory interact before generating individual file breakdowns.
+* Read the codebase files matching the **inclusion criteria** (i.e., everything not excluded in Step 1).
+* If analyzing a directory, apply the **Phase 3 priority sort** from `references/directory-traversal.md` to read manifest/entrypoint files first, building context before reading deeper modules.
+* Construct an internal dependency map showing how the included files interact.
 * Consult `references/architectural-matrix.md` to map design trade-offs for high-impact files.
 
 ### Step 4: Progressive Output Synthesis & File Writing
@@ -62,7 +67,7 @@ Compute the `.walkthrough/` output path using the following rules. The `.walkthr
 ```markdown
 # 📁 Directory Walkthrough: `[Folder Path]`
 
-> **Scope Summary**: Analyzed `[X]` files across `[Y]` subdirectories, dynamically filtering ignored assets.
+> **Scope Summary**: Analyzed `[X]` files across `[Y]` subdirectories. Detected ecosystems: `[e.g., Node/TypeScript, Python]`. Excluded: `[list key ignored folders, e.g., node_modules/, .next/, __pycache__/]`.
 
 ## 1. High-Level Folder Purpose
 *A macro-level summary of what this directory/module layer accomplishes as a cohesive unit.*
@@ -154,4 +159,4 @@ Use the links above to navigate the walkthrough.
 4. **File naming**: Append `.md` to the original filename (e.g., `login.ts` → `login.ts.md`). Do not strip the original extension.
 5. **Directory index files** are named `index.md` and placed inside the mirrored directory folder.
 6. **Overwrite** existing walkthrough files if re-running on the same target.
-7. Skip boilerplate/generated files as defined in `references/directory-traversal.md`.
+7. **Exclusion is framework-aware**: Before traversal, detect active ecosystems via Phase 0 of `references/directory-traversal.md`, then apply universal + ecosystem-specific + generated-file exclusions (Phases 1a–1c). Never traverse `node_modules/`, `build/`, `dist/`, `target/`, `.gradle/`, `__pycache__/`, `vendor/`, `.next/`, `DerivedData/`, `.terraform/`, or any other build/dependency artifact folder.
