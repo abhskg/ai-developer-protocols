@@ -51,6 +51,18 @@ Compute the `.walkthrough/` output path using the following rules. The `.walkthr
 * Construct an internal dependency map showing how the included files interact.
 * Consult `references/architectural-matrix.md` to map design trade-offs for high-impact files.
 
+### Step 3.5: Function-Level Extraction
+For **every non-excluded source file** that will receive a walkthrough:
+* Enumerate **all functions, methods, classes, and exported symbols** defined in the file.
+* For each unit, capture:
+  - **Signature** — the full declaration/prototype as it appears in source.
+  - **Purpose** — a concise description of what it does.
+  - **Parameters** — name, type, and description for every parameter.
+  - **Return value** — type and meaning of the return (or `void`/`None`/`Future<void>` etc.).
+  - **Usage example** — a minimal realistic call-site snippet (inline code block, language-tagged).
+  - **Side effects & dependencies** — external calls, state mutations, I/O, throws/exceptions.
+* If a file contains **no exported or meaningful symbols** (e.g., pure config JSON, plain CSS variables) skip this step for that file and note "No callable symbols" in section 5.
+
 ### Step 4: Progressive Output Synthesis & File Writing
 * Generate the overarching structural summary and write it to the index file (for directories).
 * Run individual file walkthroughs conditionally based on file relevance (skip boilerplate/generated files as defined in `references/directory-traversal.md`).
@@ -105,7 +117,50 @@ Compute the `.walkthrough/` output path using the following rules. The `.walkthr
 - *Chosen Pattern*: `[e.g., Local-first drift syncing via repository design]`
 - *Alternative Bypass*: `[Why this implementation was chosen over direct alternatives]`
 
-## 5. Local Behavioral Topology
+## 5. Functions & API Inventory
+
+> **Required**: Document EVERY function, method, class, and exported symbol in this file.
+> If the file contains no callable symbols, write: *No callable symbols — pure configuration/data file.*
+
+---
+
+### `FunctionOrMethodName`
+
+**Signature**
+```[language]
+[Full declaration exactly as it appears in source]
+```
+
+**Purpose**  
+[One or two sentences describing what this function does and why it exists.]
+
+**Parameters**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `paramName` | `Type` | ✅ / ❌ | What this parameter controls or represents. |
+
+**Return Value**
+
+| Type | Description |
+|------|-------------|
+| `ReturnType` | What the returned value represents; `void` / `Future<void>` / `None` if no return. |
+
+**Usage Example**
+```[language]
+// Minimal realistic call-site snippet
+[example call]
+```
+
+**Side Effects & Dependencies**
+- [External API calls, database writes, state mutations, throws/exceptions, platform channels, etc.]
+- [None] if purely functional with no side effects.
+
+---
+
+*Repeat the block above for each function / method / class / exported symbol in the file.*
+
+## 6. Local Behavioral Topology
 > Triggered conditionally based on the rules in `references/file-breakdown-engine.md`.
 [If triggered, insert the custom Mermaid diagram here. If skipped, omit this subsection entirely.]
 ```
