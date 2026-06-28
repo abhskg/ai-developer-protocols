@@ -59,6 +59,7 @@ For **every non-excluded source file** that will receive a walkthrough:
   - **Purpose** — a concise description of what it does.
   - **Parameters** — name, type, and description for every parameter.
   - **Return value** — type and meaning of the return (or `void`/`None`/`Future<void>` etc.).
+  - **Pseudo-code** — a brief, structured pseudo-code block illustrating the algorithm or execution flow to help experienced developers quickly understand the implementation before diving into actual code.
   - **Usage example** — a minimal realistic call-site snippet (inline code block, language-tagged).
   - **Side effects & dependencies** — external calls, state mutations, I/O, throws/exceptions.
 * If a file contains **no exported or meaningful symbols** (e.g., pure config JSON, plain CSS variables) skip this step for that file and note "No callable symbols" in section 5.
@@ -146,6 +147,11 @@ For **every non-excluded source file** that will receive a walkthrough:
 |------|-------------|
 | `ReturnType` | What the returned value represents; `void` / `Future<void>` / `None` if no return. |
 
+**Pseudo-code**
+```text
+[A clear, simplified pseudo-code representation of the function's flow/algorithm]
+```
+
 **Usage Example**
 ```[language]
 // Minimal realistic call-site snippet
@@ -179,6 +185,11 @@ For **every non-excluded source file** that will receive a walkthrough:
 ## Parameters & Return Values
 | Param | Type | Description |
 |-------|------|-------------|
+
+## Pseudo-code
+```text
+[A clear, simplified pseudo-code representation of the function's flow/algorithm]
+```
 
 ## Internal Flow
 [Mermaid flowchart or step-by-step breakdown]
